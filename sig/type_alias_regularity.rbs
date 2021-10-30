@@ -78,7 +78,10 @@ module RBS
 
     def validate_alias_type: (Types::Alias, Set[TypeName], Hash[TypeName, Types::Alias]) -> void
 
-    def build_alias_type: (TypeName) -> Types::Alias
+    # Returns alias type for given type name, if the alias is generic.
+    # Returns nil if the type alias is not generic.
+    # 
+    def build_alias_type: (TypeName) -> Types::Alias?
 
     def compatible_args?: (Array[Types::t], Array[Types::t]) -> boolish
 

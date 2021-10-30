@@ -21,9 +21,16 @@ module RBS
       diagnostics.clear
 
       each_mutual_alias_defs do |names|
-        name = names.first or raise
-        type = build_alias_type(name)
-        validate_alias_type(type, names, {})
+        # Find the first generic type alias in strongly connected component.
+        # This is to skip the regularity check when the alias is not generic.
+        names.each do |name|
+          # @type break: nil
+          if type = build_alias_type(name)
+            # Running validation only once from the first generic type is enough, because they are mutual recursive definition.
+            validate_alias_type(type, names, {})
+            break
+          end
+        end
       end
     end
 
@@ -49,8 +56,10 @@ module RBS
 
     def build_alias_type(name)
       entry = env.alias_decls[name] or raise "Unknown alias name: #{name}"
-      as = entry.decl.type_params.each.map {|param| Types::Variable.new(name: param.name, location: nil) }
-      Types::Alias.new(name: name, args: as, location: nil)
+      unless entry.decl.type_params.empty?
+        as = entry.decl.type_params.each.map {|param| Types::Variable.new(name: param.name, location: nil) }
+        Types::Alias.new(name: name, args: as, location: nil)
+      end
     end
 
     def compatible_args?(args1, args2)
