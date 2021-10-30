@@ -17,8 +17,8 @@ module RBS
     # Validates presence of the relative type, and application arity match.
     def validate_type(type, context:)
       case type
-      when Types::ClassInstance, Types::Interface
-        # @type var type: Types::ClassInstance | Types::Interface
+      when Types::ClassInstance, Types::Interface, Types::Alias
+        # @type var type: Types::ClassInstance | Types::Interface | Types::Alias
         if type.name.namespace.relative?
           type = _ = absolute_type(type, context: context) do |_|
             NoTypeFoundError.check!(type.name.absolute!, env: env, location: type.location)
@@ -43,8 +43,8 @@ module RBS
           location: type.location
         )
 
-      when Types::Alias, Types::ClassSingleton
-        # @type var type: Types::Alias | Types::ClassSingleton
+      when Types::ClassSingleton
+        # @type var type: Types::ClassSingleton
         type = _ = absolute_type(type, context: context) { type.name.absolute! }
         NoTypeFoundError.check!(type.name, env: env, location: type.location)
       end
