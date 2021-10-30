@@ -30,6 +30,8 @@ module RBS
                         env.class_decls[type.name]&.type_params
                       when Types::Interface
                         env.interface_decls[type.name]&.decl&.type_params
+                      when Types::Alias
+                        env.alias_decls[type.name]&.decl&.type_params
                       end
 
         unless type_params
